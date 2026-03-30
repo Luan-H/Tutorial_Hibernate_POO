@@ -1,0 +1,129 @@
+	Dentro do Web Pages, clique com o botão direito no META-INF. Nele clique em "New" e em "Persistence Unit...", na janela que abrir, digite no campo de nome: "persistence.xml", selecione a conexão com o seu banco de dados no campo de "Database Connection:", e clique em finish.
+	Dentro do seu arquivo persistence.xml coloque o código:
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="filme">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <properties>
+            <!-- Propriedades JDBC -->
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3307/filme?createDatabaseIfNotExist=true"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.password" value="123123123"/>
+            <!-- Configurações específicas do Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+
+	Agora o seu persistence.xml está configurado pra conectar o hybernate com o seu banco de dados MySQL.
+	Agora, vamos testar o seu banco de dados. Clique com o botão esquerdo na seta ao lado do "Source Packages" e em "<default package>" clique com o botão direito e crie uma classe java com o nome "Filme". Dentro dessa classe você coloca o seguinte código:
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/*
+    titulo, diretor, anoLancamento, genero, duracaoEmMinutos, sinopse
+*/
+@Entity
+@Table(name="filme")
+public class Filme {
+    String titulo;
+    String diretor;
+    String genero;
+    int anoLancamento;
+    String sinopse;
+    int duracaoEmMinutos;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+
+    public Filme() {
+    }
+    public String getTitulo(){
+        return this.titulo;
+    }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+    public String getDiretor(){
+        return this.diretor;
+    }
+    public void setDiretor(String diretor) {
+        this.diretor = diretor;
+    }
+    public String getGenero(){
+        return this.genero;
+    }
+    public void setGenero(String genero){
+        this.genero = genero;
+    }
+    public int getAnoLancamento(){
+        return this.anoLancamento;
+    }
+    public void setAnoLancamento(int duracao){
+        this.anoLancamento = duracao;
+    }
+    public String getSinopse(){
+        return this.sinopse;
+    }
+    public void setSinopse(String sinopse) {
+        this.sinopse = sinopse;
+    }
+    public int getDuracaoEmMinutos(){
+        return this.duracaoEmMinutos;
+    }
+    public void setDuracaoEmMinutos(int duracaoEmMinutos) {
+        this.duracaoEmMinutos = duracaoEmMinutos;
+    }
+    public Long getId(){
+        return this.id;
+    }
+}
+
+
+	Esse código cria um objeto chamado Filme, nele tem: titulo, diretor, gênero, anoLancamento, sinopse e duracaoEmMinutos. Ele também cria um constructor vazio e faz o seus getters e setters.
+	Agora que temos uma classe de objeto criado, vamos criar uma outra classe em java, para podermos testar de fato o objeto e povoar a tabela SQL.
+	Seguindo os mesmos passos que fizemos para criar a classe "Filme", criaremos agora a classe "app", onde colocaremos o código para fazermos o povoamento do SQL. Dentro do app.java, coloque esse código:
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+
+public class app {
+
+    public static void main(String[] args) {
+
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("filme");
+
+        EntityManager em = factory.createEntityManager();
+
+        Filme filme = new Filme();
+        
+        filme.setTitulo("Interestelar");
+        filme.setDiretor("Christopher Nolan");
+        filme.setAnoLancamento(2014);
+        filme.setGenero("Ficção Científica");
+        filme.setDuracaoEmMinutos(169);
+        filme.setSinopse("Em um futuro próximo");
+
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        em.persist(filme);
+        tx.commit();
+
+        em.close();
+        factory.close();
+    }
+}
