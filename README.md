@@ -176,3 +176,5 @@ public class app {
     }
 }
 ```
+### 5.3. Testando o banco de dados de fato.
+1 - Agora, no arquivo app.java, clique com o botão direito sobre o código e clique em "Run File". Se tudo deu certo, irá aparecer **BUILD SUCCESSFUL** em verde no seu terminal.
